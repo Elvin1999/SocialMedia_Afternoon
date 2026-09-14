@@ -14,7 +14,7 @@ import {
 } from '@tanstack/react-query';
 
 import App from './App';
-// import theme from './theme/theme';
+import theme from './theme/theme';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -31,13 +31,13 @@ ReactDOM.createRoot(
 ).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      {/* <ThemeProvider theme={theme}> */}
-        {/* <CssBaseline /> */}
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
 
         <BrowserRouter>
           <App />
         </BrowserRouter>
-      {/* </ThemeProvider> */}
+      </ThemeProvider>
     </QueryClientProvider>
   </React.StrictMode>
 );
