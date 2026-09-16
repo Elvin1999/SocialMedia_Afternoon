@@ -9,7 +9,7 @@ namespace SMM.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+//[Authorize]
 public class PostsController : ControllerBase
 {
     private readonly AppDbContext _dbContext;
