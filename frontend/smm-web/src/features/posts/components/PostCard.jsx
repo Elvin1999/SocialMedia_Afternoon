@@ -21,7 +21,7 @@ import {
   import { API_ORIGIN } from "../../../config";
   
   import { useState } from "react";
-//   import CommentSection from "../../comments/components/CommentSection";
+  import CommentSection from "../../comments/components/CommentSection";
   
   export default function PostCard({ post }) {
     const [showComments, setShowComments] = useState(false);
@@ -647,7 +647,7 @@ import {
         {showComments && (
           <>
             <Divider />
-            {/* <CommentSection postId={post.id} /> */}
+            <CommentSection postId={post.id} />
           </>
         )}
       </Paper>
