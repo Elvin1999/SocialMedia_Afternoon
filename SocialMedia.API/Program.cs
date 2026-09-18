@@ -3,8 +3,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using SocialMedia.Application.Notifications.Interfaces;
 using SocialMedia.Domain.Entities;
+using SocialMedia.Infrastructure.Notifications;
 using SocialMedia.Infrastructure.Persistence;
+using SocialMedia.Infrastructure.RealTime;
 using System;
 using System.Text;
 
@@ -35,6 +38,9 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthHelper, AuthHelper>();
 builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
 
+builder.Services.AddScoped<INotificationService, NotificationService>();
+
+builder.Services.AddSignalR();
 // =========================
 // Identity
 // =========================
@@ -84,22 +90,59 @@ builder.Services
     })
     .AddJwtBearer(options =>
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
+        options.TokenValidationParameters =
+            new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
 
-            ValidIssuer = jwtIssuer,
-            ValidAudience = jwtAudience,
+                ValidIssuer = jwtIssuer,
+                ValidAudience = jwtAudience,
 
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtKey)
-            ),
+                IssuerSigningKey =
+                    new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(
+                            jwtKey
+                        )
+                    ),
 
-            ClockSkew = TimeSpan.Zero
-        };
+                ClockSkew =
+                    TimeSpan.Zero
+            };
+
+        options.Events =
+            new JwtBearerEvents
+            {
+                OnMessageReceived =
+                    context =>
+                    {
+                        var accessToken =
+                            context.Request.Query[
+                                "access_token"
+                            ];
+
+                        var path =
+                            context.HttpContext
+                                .Request.Path;
+
+                        if (
+                            !string.IsNullOrEmpty(
+                                accessToken
+                            ) &&
+                            path.StartsWithSegments(
+                                "/hubs"
+                            )
+                        )
+                        {
+                            context.Token =
+                                accessToken;
+                        }
+
+                        return Task.CompletedTask;
+                    }
+            };
     });
 
 
@@ -132,9 +175,6 @@ builder.Services.AddCors(options =>
 // SignalR
 // =========================
 
-builder.Services.AddSignalR();
-
-
 var app = builder.Build();
 
 
@@ -160,7 +200,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 // SignalR hub əlavə edəndə:
-// app.MapHub<NotificationHub>("/hubs/notifications");
+app.MapHub<NotificationHub>("/hubs/notifications");
 // app.MapHub<ChatHub>("/hubs/chat");
 
 app.Run();
