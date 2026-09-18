@@ -18,6 +18,8 @@ import NotificationsNoneRoundedIcon from '@mui/icons-material/NotificationsNoneR
 import ChatBubbleOutlineRoundedIcon from '@mui/icons-material/ChatBubbleOutlineRounded';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 
+import NotificationsMenu from '../features/notifications/components/NotificationsMenu';
+
 import { useQuery } from '@tanstack/react-query';
 
 import { getPosts } from '../features/posts/api/postsApi';
@@ -128,14 +130,16 @@ export default function FeedPage() {
             </Badge>
           </IconButton>
 
-          <IconButton>
+          {/* <IconButton>
             <Badge
               color="error"
               badgeContent={5}
             >
               <NotificationsNoneRoundedIcon />
             </Badge>
-          </IconButton>
+          </IconButton> */}
+          <NotificationsMenu 
+          />
 
           <Avatar
             sx={{
